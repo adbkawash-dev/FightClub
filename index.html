@@ -6,6 +6,7 @@
     <title>School Fight Club | Rankings</title>
     <link rel="stylesheet" href="style.css">
   </head>
+
   <body data-page="home">
     <aside class="sidebar">
       <a class="brand" href="index.html"><span>SFC</span><strong>School Fight Club</strong></a>
@@ -31,7 +32,7 @@
       <section class="hero">
         <div>
           <p class="eyebrow">Current champion lock</p>
-          <h2>Kinan starts at #1 and only loses the top spot after a valid defeat.</h2>
+          <h2>Kinan at #1 and only loses the top spot after a valid defeat.</h2>
         </div>
         <div class="stat-grid">
           <div><span id="totalFighters">0</span><small>Fighters</small></div>
@@ -43,4 +44,21 @@
       <section class="panel">
         <div class="section-head">
           <div>
-            <p class
+            <p class="eyebrow">Leaderboard</p>
+            <h2>Rankings</h2>
+          </div>
+        </div>
+
+        <div id="leaderboard"></div>
+      </section>
+    </main>
+
+    <!-- Firebase + App Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="script.js"></script>
+
+  </body>
+</html>
