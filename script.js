@@ -57,6 +57,9 @@ const state = {
     bindPageForms();
     render();
     setConnectionStatus();
+
+const card = generateFightCard(state.rankings);
+console.log(card);
   }
 
   function bootFirebase() {
@@ -245,9 +248,6 @@ const state = {
 
   function render() {
     state.rankings = calculateRankings(state.fighters, state.fights);
-
-const card = generateFightCard(state.rankings);
-console.log(card);
 
     renderLeaderboard();
     renderFighters();
