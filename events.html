@@ -1,34 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Events</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>School Fight Club | Events</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body data-page="events">
+    <aside class="sidebar">
+      <a class="brand" href="index.html"><span>SFC</span><strong>School Fight Club</strong></a>
+      <nav>
+        <a href="index.html">Leaderboard</a>
+        <a href="fighters.html">Fighters</a>
+        <a class="active" href="events.html">Events</a>
+        <a href="rules.html">Rules</a>
+        <a href="suggest.html">Suggest</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </aside>
 
-<nav>
-  <a href="index.html">🏆 Rankings</a>
-  <a href="events.html">📅 Events</a>
-</nav>
-
-<div class="container">
-  <h1>📅 Events</h1>
-  <div id="events"></div>
-</div>
-
-<script>
-fetch("data/events.json")
-  .then(r => r.json())
-  .then(data => {
-    document.getElementById("events").innerHTML =
-      data.map(e=>`
-        <div class="card">
-          <h3>${e.title}</h3>
-          <p>${e.type}</p>
+    <main class="app">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">Cards and matches</p>
+          <h1>Events</h1>
         </div>
-      `).join("");
-  });
-</script>
+        <div class="status-pill" id="connectionStatus">Loading</div>
+      </section>
 
-</body>
+      <section class="panel">
+        <div class="section-head">
+          <h2>Approved Events</h2>
+          <a class="button ghost" href="suggest.html">Suggest event</a>
+        </div>
+        <div class="event-list" id="eventList"></div>
+      </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
