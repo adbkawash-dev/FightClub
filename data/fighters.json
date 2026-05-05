@@ -1,62 +1,12 @@
 [
-  {
-    "name": "Kinan",
-    "wins": 0,
-    "losses": 0,
-    "rank": 1
-  },
-  {
-    "name": "Ayham",
-    "wins": 0,
-    "losses": 0,
-    "rank": null
-  },
-  {
-    "name": "Hajar",
-    "wins": 0,
-    "losses": 0,
-    "rank": null
-  },
-  {
-    "name": "Aburoza",
-    "wins": 0,
-    "losses": 0,
-    "rank": null
-  },
-  {
-    "name": "Mubarak Al Khalifa",
-    "wins": 0,
-    "losses": 0,
-    "rank": null
-  },
-  {
-    "name": "Mustafa",
-    "wins": 0,
-    "losses": 0,
-    "rank": null
-  },
-  {
-    "name": "Rayyan",
-    "wins": 0,
-    "losses": 0,
-    "rank": null
-  },
-  {
-    "name": "Ahmad Zoubi",
-    "wins": 0,
-    "losses": 0,
-    "rank": null
-  },
-  {
-    "name": "Abdi",
-    "wins": 0,
-    "losses": 0,
-    "rank": null
-  },
-  {
-    "name": "Abed",
-    "wins": 0,
-    "losses": 0,
-    "rank": null
-  }
+  { "name": "Kinan", "wins": 0, "losses": 0, "rank": 1 },
+  { "name": "Ayham", "wins": 0, "losses": 0, "rank": null },
+  { "name": "Hajar", "wins": 0, "losses": 0, "rank": null },
+  { "name": "Aburoza", "wins": 0, "losses": 0, "rank": null },
+  { "name": "Mubarak Al Khalifa", "wins": 0, "losses": 0, "rank": null },
+  { "name": "Mustafa", "wins": 0, "losses": 0, "rank": null },
+  { "name": "Rayyan", "wins": 0, "losses": 0, "rank": null },
+  { "name": "Ahmad Zoubi", "wins": 0, "losses": 0, "rank": null },
+  { "name": "Abdi", "wins": 0, "losses": 0, "rank": null },
+  { "name": "Abed", "wins": 0, "losses": 0, "rank": null }
 ]
