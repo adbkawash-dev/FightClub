@@ -1,48 +1,80 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>School Fight Club | Suggest Event</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body data-page="suggest">
-    <aside class="sidebar">
-      <a class="brand" href="index.html"><span>SFC</span><strong>School Fight Club</strong></a>
-      <nav>
-        <a href="index.html">Leaderboard</a>
-        <a href="fighters.html">Fighters</a>
-        <a href="events.html">Events</a>
-        <a href="rules.html">Rules</a>
-        <a class="active" href="suggest.html">Suggest</a>
-        <a href="admin.html">Admin</a>
-      </nav>
-    </aside>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>School Fight Club | Suggest Event</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 
-    <main class="app">
-      <section class="topbar">
-        <div>
-          <p class="eyebrow">User submission</p>
-          <h1>Suggest Event</h1>
-        </div>
-        <div class="status-pill" id="connectionStatus">Loading</div>
-      </section>
+<body data-page="suggest">
 
-      <section class="panel narrow">
-        <form id="suggestForm" class="form-grid">
-          <label>Event title<input name="title" required maxlength="80" placeholder="Friday ranking card"></label>
-          <label>Match type<select name="type"><option>1v1</option><option>2v2</option><option>3v3</option></select></label>
-          <label>Date<input name="date" type="date" required></label>
-          <button class="button primary" type="submit">Submit for approval</button>
-          <p class="form-message" id="suggestMessage"></p>
-        </form>
-      </section>
-    </main>
+  <aside class="sidebar">
+    <a class="brand" href="index.html"><span>SFC</span><strong>School Fight Club</strong></a>
+    <nav>
+      <a href="index.html">Leaderboard</a>
+      <a href="fighters.html">Fighters</a>
+      <a href="events.html">Events</a>
+      <a href="rules.html">Rules</a>
+      <a class="active" href="suggest.html">Suggest</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </aside>
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="script.js"></script>
-  </body>
+  <main class="app">
+
+    <section class="topbar">
+      <div>
+        <p class="eyebrow">User submission</p>
+        <h1>Suggest Event</h1>
+      </div>
+
+      <div class="status-pill" id="connectionStatus">Loading</div>
+    </section>
+
+    <section class="panel narrow">
+
+      <form id="suggestForm" class="form-grid">
+
+        <label>
+          Event title
+          <input name="title" required maxlength="80" placeholder="Friday ranking card">
+        </label>
+
+        <label>
+          Match type
+          <select name="type">
+            <option value="1v1">1v1</option>
+            <option value="2v2">2v2</option>
+            <option value="3v3">3v3</option>
+          </select>
+        </label>
+
+        <label>
+          Date
+          <input name="date" type="date" required>
+        </label>
+
+        <button class="button primary" type="submit">
+          Submit for approval
+        </button>
+
+        <p class="form-message" id="suggestMessage"></p>
+
+      </form>
+
+    </section>
+
+  </main>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+  <!-- Config + App -->
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+
+</body>
 </html>
