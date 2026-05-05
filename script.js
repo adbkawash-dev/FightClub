@@ -898,6 +898,27 @@ function renderCompletedEvents() {
 }
 
 
+  function generateFightCard(fighters) {
+  const sorted = fighters.slice().sort((a, b) => a.rank - b.rank);
+
+  const labels = ["Main Event", "Co-Main Event", "Prelim 1", "Prelim 2", "Prelim 3"];
+
+  return sorted.slice(0, 6).reduce((card, fighter, i, arr) => {
+    if (i % 2 === 0 && arr[i + 1]) {
+      card.push({
+        fighter1: fighter.name,
+        fighter2: arr[i + 1].name,
+        type: labels[Math.floor(i / 2)] || "Prelim"
+      });
+    }
+    return card;
+  }, []);
+}
+
+
+const card = generateFightCard(state.rankings);
+console.log(card);
+
 
   
 })();
