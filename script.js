@@ -334,6 +334,7 @@
         <p class="meta">${getFightResultText(name, fight)}</p>
         <p class="meta">Type: ${escapeHtml(fight.type || "1v1")} / ${formatDateTime(fight.timestamp)}</p>
 
+        ${fight.comment ? `<p class="meta">Comment: ${escapeHtml(fight.comment)}</p>` : ""}
         ${fight.reason ? `<p class="meta">Reason: ${escapeHtml(fight.reason)}</p>` : ""}
       </article>
     `;
@@ -460,6 +461,7 @@
           Winner: ${escapeHtml(fight.winner || "None")} / ${escapeHtml(fight.type || "1v1")} / ${formatDateTime(fight.timestamp)}
         </div>
 
+        ${fight.comment ? `<p class="meta">Comment: ${escapeHtml(fight.comment)}</p>` : ""}
         ${fight.reason ? `<div class="meta">Reason: ${escapeHtml(fight.reason)}</div>` : ""}
       </article>
     `;
@@ -476,6 +478,7 @@
           <span class="badge ${classForStatus(fight.status)}">${labelStatus(fight.status)}</span>
         </div>
 
+        ${fight.comment ? `<p class="meta">Comment: ${escapeHtml(fight.comment)}</p>` : ""}
         ${fight.reason ? `<p class="meta">Reason: ${escapeHtml(fight.reason)}</p>` : ""}
 
         <div class="actions">
@@ -590,6 +593,7 @@
       type: form.get("type"),
       status: "valid",
       reason: "",
+      comment: clean(form.get("comment")),
       timestamp: new Date().toISOString()
     };
 
