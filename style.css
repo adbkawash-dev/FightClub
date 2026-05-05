@@ -1,1 +1,41 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0f0f0f;
+  color: white;
+}
 
+nav {
+  width: 200px;
+  height: 100vh;
+  position: fixed;
+  background: #1a1a1a;
+  padding-top: 20px;
+}
+
+nav a {
+  display: block;
+  padding: 12px;
+  color: white;
+  text-decoration: none;
+}
+
+nav a:hover {
+  background: #333;
+}
+
+.container {
+  margin-left: 220px;
+  padding: 20px;
+}
+
+.card {
+  background: #1e1e1e;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+h1 {
+  color: cyan;
+}
