@@ -2,7 +2,7 @@
   "use strict";
 
   const ADMIN_PASSWORD = "ADBK@QAST";
-  const STORAGE_KEY = "school-fight-club-state-v3";
+  const STORAGE_KEY = "school-fight-club-state-v5";
 
   const OFFICIAL_FIGHTERS = [
     { id: "kinan", name: "Kinan", wins: 0, losses: 0, rank: 1, baseRank: 1, active: true },
@@ -86,10 +86,10 @@
       readCollection("suggestions")
     ]);
 
-    state.fighters = fighters.length ? fighters : OFFICIAL_FIGHTERS;
-    state.fights = fights;
-    state.events = events.length ? events : DEFAULT_EVENTS;
-    state.suggestions = suggestions;
+    state.fighters = fighters.length ? fighters : OFFICIAL_FIGHTERS.slice();
+    state.fights = fights || [];
+    state.events = events.length ? events : DEFAULT_EVENTS.slice();
+    state.suggestions = suggestions || [];
 
     subscribeFirestore();
   }
@@ -99,8 +99,8 @@
       state.db.collection(name).onSnapshot((snap) => {
         state[name] = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
-        if (!state.fighters.length) state.fighters = OFFICIAL_FIGHTERS;
-        if (!state.events.length) state.events = DEFAULT_EVENTS;
+        if (!state.fighters.length) state.fighters = OFFICIAL_FIGHTERS.slice();
+        if (!state.events.length) state.events = DEFAULT_EVENTS.slice();
 
         enforceOfficialRoster();
         state.rankings = calculateRankings(state.fighters, state.fights);
@@ -117,37 +117,19 @@
   async function loadLocal() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
 
+    state.fighters = OFFICIAL_FIGHTERS.slice();
+    state.fights = [];
+    state.events = DEFAULT_EVENTS.slice();
+    state.suggestions = [];
+
     if (saved) {
-      state.fighters = saved.fighters || OFFICIAL_FIGHTERS;
-      state.fights = saved.fights || [];
-      state.events = saved.events || DEFAULT_EVENTS;
-      state.suggestions = saved.suggestions || [];
-      return;
+      state.fighters = saved.fighters && saved.fighters.length ? saved.fighters : OFFICIAL_FIGHTERS.slice();
+      state.fights = Array.isArray(saved.fights) ? saved.fights : [];
+      state.events = saved.events && saved.events.length ? saved.events : DEFAULT_EVENTS.slice();
+      state.suggestions = Array.isArray(saved.suggestions) ? saved.suggestions : [];
     }
-
-    const [fighters, fights, events, suggestions] = await Promise.all([
-      fetchJson("data/fighters.json"),
-      fetchJson("data/fights.json"),
-      fetchJson("data/events.json"),
-      fetchJson("data/suggestions.json")
-    ]);
-
-    state.fighters = fighters.length ? fighters : OFFICIAL_FIGHTERS;
-    state.fights = fights.length ? fights : [];
-    state.events = events.length ? events : DEFAULT_EVENTS;
-    state.suggestions = suggestions.length ? suggestions : [];
 
     persistLocal();
-  }
-
-  async function fetchJson(path) {
-    try {
-      const res = await fetch(path);
-      if (!res.ok) throw new Error(path);
-      return await res.json();
-    } catch (error) {
-      return [];
-    }
   }
 
   function persistLocal() {
@@ -203,7 +185,7 @@
       return kinanWasInFight && fight.winner !== "Kinan";
     });
 
-    const sorted = stats.sort(compareFighters);
+    const sorted = stats.slice().sort(compareFighters);
 
     const finalList = kinanDefeated
       ? sorted
@@ -412,29 +394,41 @@
   function renderAdmin() {
     if (page !== "admin") return;
 
-    document.getElementById("loginPanel").classList.toggle("hidden", state.isAdmin);
-    document.getElementById("adminPanel").classList.toggle("hidden", !state.isAdmin);
-    document.getElementById("logoutButton").classList.toggle("hidden", !state.isAdmin);
+    const loginPanel = document.getElementById("loginPanel");
+    const adminPanel = document.getElementById("adminPanel");
+    const logoutButton = document.getElementById("logoutButton");
+
+    if (loginPanel) loginPanel.classList.toggle("hidden", state.isAdmin);
+    if (adminPanel) adminPanel.classList.toggle("hidden", !state.isAdmin);
+    if (logoutButton) logoutButton.classList.toggle("hidden", !state.isAdmin);
 
     if (!state.isAdmin) return;
 
     const fightDashboard = document.getElementById("fightDashboard");
+    const suggestionDashboard = document.getElementById("suggestionDashboard");
+    const eventDashboard = document.getElementById("eventDashboard");
 
-    fightDashboard.innerHTML = state.fights
-      .slice()
-      .sort(newestFirst)
-      .map(fightManageCard)
-      .join("") || empty("No fights logged.");
+    if (fightDashboard) {
+      fightDashboard.innerHTML = state.fights
+        .slice()
+        .sort(newestFirst)
+        .map(fightManageCard)
+        .join("") || empty("No fights logged.");
+    }
 
-    document.getElementById("suggestionDashboard").innerHTML = state.suggestions
-      .filter((item) => item.status === "pending")
-      .map(suggestionCard)
-      .join("") || empty("No pending suggestions.");
+    if (suggestionDashboard) {
+      suggestionDashboard.innerHTML = state.suggestions
+        .filter((item) => item.status === "pending")
+        .map(suggestionCard)
+        .join("") || empty("No pending suggestions.");
+    }
 
-    document.getElementById("eventDashboard").innerHTML = state.events
-      .sort((a, b) => String(a.date).localeCompare(String(b.date)))
-      .map((event) => eventCard(event, true))
-      .join("") || empty("No events created.");
+    if (eventDashboard) {
+      eventDashboard.innerHTML = state.events
+        .sort((a, b) => String(a.date).localeCompare(String(b.date)))
+        .map((event) => eventCard(event, true))
+        .join("") || empty("No events created.");
+    }
   }
 
   function renderRecentFights() {
@@ -525,8 +519,6 @@
   }
 
   function bindPageForms() {
-    renderRecentFights();
-
     document.getElementById("adminLoginForm")?.addEventListener("submit", handleLogin);
     document.getElementById("logoutButton")?.addEventListener("click", handleLogout);
     document.getElementById("fightForm")?.addEventListener("submit", handleFightSubmit);
@@ -557,7 +549,7 @@
         throw new Error(
           state.isFirebase
             ? "Use a Firebase account with the admin custom claim."
-            : "Use the temporary local password admin123."
+            : "Wrong admin password."
         );
       }
 
@@ -647,7 +639,13 @@
       createdAt: new Date().toISOString()
     };
 
-    await saveDoc("suggestions", item, true);
+    if (state.isFirebase) {
+      await state.db.collection("suggestions").doc(item.id).set(item);
+    } else {
+      state.suggestions.push(item);
+      persistLocal();
+      render();
+    }
 
     message("suggestMessage", "Suggestion submitted for admin approval.");
     event.currentTarget.reset();
@@ -706,17 +704,20 @@
       if (!suggestion) return;
 
       await saveDoc("events", {
-        ...suggestion,
         id: crypto.randomUUID(),
+        title: suggestion.title,
+        type: suggestion.type,
+        date: suggestion.date,
         status: "approved",
+        createdAt: suggestion.createdAt,
         approvedAt: new Date().toISOString()
       });
 
-      await updateDoc("suggestions", id, { status: "approved" });
+      await updateSuggestionStatus(id, "approved");
     }
 
     if (action === "reject-suggestion") {
-      await updateDoc("suggestions", id, { status: "rejected" });
+      await updateSuggestionStatus(id, "rejected");
     }
   }
 
@@ -747,6 +748,21 @@
     }
   }
 
+  async function updateSuggestionStatus(id, status) {
+    if (!requireAdmin()) return;
+
+    if (state.isFirebase) {
+      await state.db.collection("suggestions").doc(id).update({ status });
+    } else {
+      state.suggestions = state.suggestions.map((item) => {
+        return item.id === id ? { ...item, status } : item;
+      });
+
+      persistLocal();
+      render();
+    }
+  }
+
   async function deleteDoc(collection, id) {
     if (!requireAdmin()) return;
 
@@ -769,6 +785,8 @@
 
     ["fighter1", "fighter2", "winner"].forEach((name) => {
       const select = form.elements[name];
+      if (!select) return;
+
       const current = select.value;
 
       select.innerHTML = options;
