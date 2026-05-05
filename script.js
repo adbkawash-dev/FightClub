@@ -58,8 +58,6 @@ const state = {
     render();
     setConnectionStatus();
 
-const card = generateFightCard(state.rankings);
-console.log(card);
   }
 
   function bootFirebase() {
