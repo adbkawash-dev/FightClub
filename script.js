@@ -1,6 +1,3 @@
-Here is the full `script.js`. Replace your entire `script.js` with this.
-
-```javascript
 (function () {
   "use strict";
 
