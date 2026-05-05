@@ -871,4 +871,23 @@
   function message(id, value) {
     text(id, value);
   }
+
+
+function renderCompletedEvents() {
+  const target = document.getElementById("completedEvents");
+  if (!target) return;
+
+  const completed = state.fights
+    .filter(fight => fight.status === "valid")
+    .slice()
+    .sort(newestFirst);
+
+  target.innerHTML =
+    completed.map(fightCard).join("") ||
+    empty("No completed fights yet.");
+}
+
+
+
+  
 })();
