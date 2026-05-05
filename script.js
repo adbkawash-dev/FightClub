@@ -421,6 +421,8 @@
 
     if (eventList) eventList.innerHTML = eventHtml;
     if (upcomingEvents) upcomingEvents.innerHTML = approved.slice(0, 3).map(eventCard).join("") || empty("No upcoming events.");
+
+    renderCompletedEvents();
   }
 
   function renderAdmin() {
