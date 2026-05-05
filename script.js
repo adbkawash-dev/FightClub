@@ -2,7 +2,7 @@
   "use strict";
 
   const ADMIN_PASSWORD = "ADBK@QAST";
-  const STORAGE_KEY = "school-fight-club-state-v5";
+  const STORAGE_KEY = "school-fight-club-state-v6";
 
   const OFFICIAL_FIGHTERS = [
     { id: "kinan", name: "Kinan", wins: 0, losses: 0, rank: 1, baseRank: 1, active: true },
@@ -230,15 +230,23 @@
     target.innerHTML = state.rankings.map((fighter) => {
       const lastFight = getFighterHistory(fighter.name)[0];
 
+      const movement = fighter.rank < fighter.baseRank
+        ? `Moved up from #${fighter.baseRank}`
+        : fighter.rank > fighter.baseRank
+          ? `Moved down from #${fighter.baseRank}`
+          : "Holding original seed";
+
       return `
         <article class="leader-row" data-fighter="${escapeAttr(fighter.name)}" style="cursor:pointer">
           <div class="rank">#${fighter.rank}</div>
 
           <div>
             <h2>${escapeHtml(fighter.name)}</h2>
+
             <p class="meta">
-              ${fighter.name === "Kinan" ? "Champion lock active until valid defeat" : "Official contender"}
+              ${fighter.name === "Kinan" ? "Champion lock active until valid defeat" : movement}
             </p>
+
             <p class="meta">
               Last result: ${lastFight ? getFightResultText(fighter.name, lastFight) : "No fights yet"}
             </p>
@@ -250,15 +258,32 @@
       `;
     }).join("");
 
-    ensureHistoryPanel(target);
+    ensureHistoryPanel(target, "leaderboard");
   }
 
-  function ensureHistoryPanel(leaderboard) {
-    let panel = document.getElementById("fighterHistoryPanel");
+  function renderFighters() {
+    const publicGrid = document.getElementById("fighterGrid");
+    const adminGrid = document.getElementById("adminFighterGrid");
+
+    if (publicGrid) {
+      publicGrid.innerHTML = state.rankings.map((fighter) => fighterCard(fighter)).join("");
+      ensureHistoryPanel(publicGrid, "fighters");
+    }
+
+    if (adminGrid) {
+      adminGrid.innerHTML = state.rankings.map((fighter) => fighterCard(fighter, true)).join("");
+    }
+
+    populateFightDropdowns();
+  }
+
+  function ensureHistoryPanel(container, location) {
+    const panelId = location === "fighters" ? "fighterPageHistoryPanel" : "fighterHistoryPanel";
+    let panel = document.getElementById(panelId);
 
     if (!panel) {
       panel = document.createElement("section");
-      panel.id = "fighterHistoryPanel";
+      panel.id = panelId;
       panel.className = "panel";
       panel.style.marginTop = "18px";
       panel.innerHTML = `
@@ -268,15 +293,18 @@
             <h2>Select a fighter</h2>
           </div>
         </div>
-        <p class="meta">Click any fighter on the leaderboard to view their fight history.</p>
+        <p class="meta">Click any fighter to view their fight history.</p>
       `;
 
-      leaderboard.parentElement.appendChild(panel);
+      container.parentElement.appendChild(panel);
     }
   }
 
   function renderFighterHistory(name) {
-    const panel = document.getElementById("fighterHistoryPanel");
+    const panel =
+      document.getElementById("fighterHistoryPanel") ||
+      document.getElementById("fighterPageHistoryPanel");
+
     if (!panel) return;
 
     const fighter = state.rankings.find((item) => item.name === name);
@@ -292,7 +320,8 @@
       </div>
 
       <p class="meta">
-        Record: ${fighter ? fighter.wins : 0} wins / ${fighter ? fighter.losses : 0} losses
+        Current leaderboard rank: #${fighter ? fighter.rank : "?"} /
+        Record: ${fighter ? fighter.wins : 0} wins, ${fighter ? fighter.losses : 0} losses
       </p>
 
       <div class="fight-list">
@@ -302,6 +331,21 @@
             : empty("This fighter has no fight history yet.")
         }
       </div>
+    `;
+  }
+
+  function fighterCard(fighter, admin = false) {
+    const lastFight = getFighterHistory(fighter.name)[0];
+
+    return `
+      <article class="fighter-card" data-fighter="${escapeAttr(fighter.name)}" style="cursor:pointer">
+        <div class="rank">#${fighter.rank}</div>
+        <h2>${escapeHtml(fighter.name)}</h2>
+        <p class="meta">Leaderboard rank: #${fighter.rank}</p>
+        <p class="meta">${fighter.wins} wins / ${fighter.losses} losses</p>
+        <p class="meta">Last result: ${lastFight ? getFightResultText(fighter.name, lastFight) : "No fights yet"}</p>
+        ${admin ? `<p class="meta">Stats are recalculated from valid fight results.</p>` : ""}
+      </article>
     `;
   }
 
@@ -344,35 +388,6 @@
     }
 
     return `Loss vs ${opponent}`;
-  }
-
-  function renderFighters() {
-    const publicGrid = document.getElementById("fighterGrid");
-    const adminGrid = document.getElementById("adminFighterGrid");
-
-    if (publicGrid) {
-      publicGrid.innerHTML = state.rankings.map((fighter) => fighterCard(fighter)).join("");
-    }
-
-    if (adminGrid) {
-      adminGrid.innerHTML = state.rankings.map((fighter) => fighterCard(fighter, true)).join("");
-    }
-
-    populateFightDropdowns();
-  }
-
-  function fighterCard(fighter, admin = false) {
-    const lastFight = getFighterHistory(fighter.name)[0];
-
-    return `
-      <article class="fighter-card" data-fighter="${escapeAttr(fighter.name)}" style="cursor:pointer">
-        <div class="rank">#${fighter.rank}</div>
-        <h2>${escapeHtml(fighter.name)}</h2>
-        <p class="meta">${fighter.wins} wins / ${fighter.losses} losses</p>
-        <p class="meta">Last result: ${lastFight ? getFightResultText(fighter.name, lastFight) : "No fights yet"}</p>
-        ${admin ? `<p class="meta">Stats are recalculated from valid fight results.</p>` : ""}
-      </article>
-    `;
   }
 
   function renderEvents() {
