@@ -1,20 +1,22 @@
+Here is the full `script.js`. Replace your entire `script.js` with this.
+
+```javascript
 (function () {
   "use strict";
 
-  const ADMIN_PASSWORD = "ADBK@QAST";
-  const STORAGE_KEY = "school-fight-club-state-v6";
+  const STORAGE_KEY = "school-fight-club-state-v8";
 
   const OFFICIAL_FIGHTERS = [
-    { id: "kinan", name: "Kinan", wins: 0, losses: 0, rank: 1, baseRank: 1, active: true },
-    { id: "ayham", name: "Ayham", wins: 0, losses: 0, rank: 2, baseRank: 2, active: true },
-    { id: "hajar", name: "Hajar", wins: 0, losses: 0, rank: 3, baseRank: 3, active: true },
-    { id: "aburoza", name: "Aburoza", wins: 0, losses: 0, rank: 4, baseRank: 4, active: true },
-    { id: "mubarak-al-khalifa", name: "Mubarak Al Khalifa", wins: 0, losses: 0, rank: 5, baseRank: 5, active: true },
-    { id: "mustafa", name: "Mustafa", wins: 0, losses: 0, rank: 6, baseRank: 6, active: true },
-    { id: "rayyan", name: "Rayyan", wins: 0, losses: 0, rank: 7, baseRank: 7, active: true },
-    { id: "ahmad-zoubi", name: "Ahmad Zoubi", wins: 0, losses: 0, rank: 8, baseRank: 8, active: true },
-    { id: "abdi", name: "Abdi", wins: 0, losses: 0, rank: 9, baseRank: 9, active: true },
-    { id: "abed", name: "Abed", wins: 0, losses: 0, rank: 10, baseRank: 10, active: true }
+    { id: "kinan", name: "Kinan", wins: 0, losses: 0, draws: 0, rank: 1, baseRank: 1, active: true },
+    { id: "ayham", name: "Ayham", wins: 0, losses: 0, draws: 0, rank: 2, baseRank: 2, active: true },
+    { id: "hajar", name: "Hajar", wins: 0, losses: 0, draws: 0, rank: 3, baseRank: 3, active: true },
+    { id: "aburoza", name: "Aburoza", wins: 0, losses: 0, draws: 0, rank: 4, baseRank: 4, active: true },
+    { id: "mubarak-al-khalifa", name: "Mubarak Al Khalifa", wins: 0, losses: 0, draws: 0, rank: 5, baseRank: 5, active: true },
+    { id: "mustafa", name: "Mustafa", wins: 0, losses: 0, draws: 0, rank: 6, baseRank: 6, active: true },
+    { id: "rayyan", name: "Rayyan", wins: 0, losses: 0, draws: 0, rank: 7, baseRank: 7, active: true },
+    { id: "ahmad-zoubi", name: "Ahmad Zoubi", wins: 0, losses: 0, draws: 0, rank: 8, baseRank: 8, active: true },
+    { id: "abdi", name: "Abdi", wins: 0, losses: 0, draws: 0, rank: 9, baseRank: 9, active: true },
+    { id: "abed", name: "Abed", wins: 0, losses: 0, draws: 0, rank: 10, baseRank: 10, active: true }
   ];
 
   const DEFAULT_EVENTS = [
@@ -36,7 +38,6 @@
     events: [],
     suggestions: [],
     rankings: [],
-    firebase: null,
     db: null,
     auth: null,
     isFirebase: false,
@@ -48,8 +49,8 @@
   async function init() {
     bootFirebase();
     await loadData();
-    render();
     bindPageForms();
+    render();
     setConnectionStatus();
   }
 
@@ -59,9 +60,8 @@
 
     if (!configured) return;
 
-    const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(cfg);
+    firebase.apps.length ? firebase.app() : firebase.initializeApp(cfg);
 
-    state.firebase = app;
     state.db = firebase.firestore();
     state.auth = firebase.auth();
     state.isFirebase = true;
@@ -71,7 +71,7 @@
     if (state.isFirebase) {
       await loadFirestore();
     } else {
-      await loadLocal();
+      loadLocal();
     }
 
     enforceOfficialRoster();
@@ -79,42 +79,64 @@
   }
 
   async function loadFirestore() {
-    const [fighters, fights, events, suggestions] = await Promise.all([
-      readCollection("fighters"),
-      readCollection("fights"),
-      readCollection("events"),
-      readCollection("suggestions")
+    await Promise.all([
+      subscribeCollection("fighters"),
+      subscribeCollection("fights"),
+      subscribeCollection("events"),
+      subscribeCollection("suggestions")
     ]);
-
-    state.fighters = fighters.length ? fighters : OFFICIAL_FIGHTERS.slice();
-    state.fights = fights || [];
-    state.events = events.length ? events : DEFAULT_EVENTS.slice();
-    state.suggestions = suggestions || [];
-
-    subscribeFirestore();
   }
 
-  function subscribeFirestore() {
-    ["fighters", "fights", "events", "suggestions"].forEach((name) => {
-      state.db.collection(name).onSnapshot((snap) => {
-        state[name] = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  async function subscribeCollection(name) {
+    const snap = await state.db.collection(name).get();
 
-        if (!state.fighters.length) state.fighters = OFFICIAL_FIGHTERS.slice();
-        if (!state.events.length) state.events = DEFAULT_EVENTS.slice();
+    state[name] = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
-        enforceOfficialRoster();
-        state.rankings = calculateRankings(state.fighters, state.fights);
-        render();
-      });
+    if (name === "fighters" && state.fighters.length === 0) {
+      await seedFightersToFirestore();
+    }
+
+    if (name === "events" && state.events.length === 0) {
+      await seedEventsToFirestore();
+    }
+
+    state.db.collection(name).onSnapshot((liveSnap) => {
+      state[name] = liveSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+      if (state.fighters.length === 0) state.fighters = OFFICIAL_FIGHTERS.slice();
+      if (state.events.length === 0) state.events = DEFAULT_EVENTS.slice();
+
+      enforceOfficialRoster();
+      state.rankings = calculateRankings(state.fighters, state.fights);
+      render();
     });
   }
 
-  async function readCollection(name) {
-    const snap = await state.db.collection(name).get();
-    return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  async function seedFightersToFirestore() {
+    state.fighters = OFFICIAL_FIGHTERS.slice();
+
+    const batch = state.db.batch();
+
+    OFFICIAL_FIGHTERS.forEach((fighter) => {
+      batch.set(state.db.collection("fighters").doc(fighter.id), fighter);
+    });
+
+    await batch.commit();
   }
 
-  async function loadLocal() {
+  async function seedEventsToFirestore() {
+    state.events = DEFAULT_EVENTS.slice();
+
+    const batch = state.db.batch();
+
+    DEFAULT_EVENTS.forEach((event) => {
+      batch.set(state.db.collection("events").doc(event.id), event);
+    });
+
+    await batch.commit();
+  }
+
+  function loadLocal() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
 
     state.fighters = OFFICIAL_FIGHTERS.slice();
@@ -123,9 +145,9 @@
     state.suggestions = [];
 
     if (saved) {
-      state.fighters = saved.fighters && saved.fighters.length ? saved.fighters : OFFICIAL_FIGHTERS.slice();
+      state.fighters = Array.isArray(saved.fighters) && saved.fighters.length ? saved.fighters : OFFICIAL_FIGHTERS.slice();
       state.fights = Array.isArray(saved.fights) ? saved.fights : [];
-      state.events = saved.events && saved.events.length ? saved.events : DEFAULT_EVENTS.slice();
+      state.events = Array.isArray(saved.events) && saved.events.length ? saved.events : DEFAULT_EVENTS.slice();
       state.suggestions = Array.isArray(saved.suggestions) ? saved.suggestions : [];
     }
 
@@ -149,8 +171,8 @@
     state.fighters = OFFICIAL_FIGHTERS.map((official) => ({
       ...official,
       ...(byName.get(official.name) || {}),
-      name: official.name,
       id: official.id,
+      name: official.name,
       baseRank: official.baseRank,
       active: true
     }));
@@ -161,6 +183,7 @@
       ...fighter,
       wins: 0,
       losses: 0,
+      draws: 0,
       rank: fighter.baseRank || 99
     }));
 
@@ -170,9 +193,17 @@
     validFights.forEach((fight) => {
       const f1 = byName.get(fight.fighter1);
       const f2 = byName.get(fight.fighter2);
-      const winner = byName.get(fight.winner);
 
-      if (!f1 || !f2 || !winner || fight.fighter1 === fight.fighter2) return;
+      if (!f1 || !f2 || fight.fighter1 === fight.fighter2) return;
+
+      if (fight.result === "draw") {
+        f1.draws += 1;
+        f2.draws += 1;
+        return;
+      }
+
+      const winner = byName.get(fight.winner);
+      if (!winner) return;
 
       const loser = fight.winner === fight.fighter1 ? f2 : f1;
 
@@ -182,7 +213,7 @@
 
     const kinanDefeated = validFights.some((fight) => {
       const kinanWasInFight = fight.fighter1 === "Kinan" || fight.fighter2 === "Kinan";
-      return kinanWasInFight && fight.winner !== "Kinan";
+      return fight.result !== "draw" && kinanWasInFight && fight.winner !== "Kinan";
     });
 
     const sorted = stats.slice().sort(compareFighters);
@@ -203,6 +234,7 @@
   function compareFighters(a, b) {
     if (b.wins !== a.wins) return b.wins - a.wins;
     if (a.losses !== b.losses) return a.losses - b.losses;
+    if (b.draws !== a.draws) return b.draws - a.draws;
     return (a.baseRank || 99) - (b.baseRank || 99);
   }
 
@@ -230,35 +262,31 @@
     target.innerHTML = state.rankings.map((fighter) => {
       const lastFight = getFighterHistory(fighter.name)[0];
 
-      const movement = fighter.rank < fighter.baseRank
-        ? `Moved up from #${fighter.baseRank}`
-        : fighter.rank > fighter.baseRank
-          ? `Moved down from #${fighter.baseRank}`
-          : "Holding original seed";
-
       return `
-        <article class="leader-row" data-fighter="${escapeAttr(fighter.name)}" style="cursor:pointer">
+        <article class="leader-row" data-fighter="${escapeAttr(fighter.name)}">
           <div class="rank">#${fighter.rank}</div>
 
           <div>
             <h2>${escapeHtml(fighter.name)}</h2>
-
-            <p class="meta">
-              ${fighter.name === "Kinan" ? "Champion lock active until valid defeat" : movement}
-            </p>
-
-            <p class="meta">
-              Last result: ${lastFight ? getFightResultText(fighter.name, lastFight) : "No fights yet"}
-            </p>
+            <p class="meta">${getMovementText(fighter)}</p>
+            <p class="meta">Last result: ${lastFight ? getFightResultText(fighter.name, lastFight) : "No fights yet"}</p>
           </div>
 
           <div class="record"><strong>${fighter.wins}</strong> W</div>
           <div class="record"><strong>${fighter.losses}</strong> L</div>
+          <div class="record"><strong>${fighter.draws}</strong> D</div>
         </article>
       `;
     }).join("");
 
     ensureHistoryPanel(target, "leaderboard");
+  }
+
+  function getMovementText(fighter) {
+    if (fighter.name === "Kinan" && fighter.rank === 1) return "Champion lock active until valid defeat";
+    if (fighter.rank < fighter.baseRank) return `Moved up from #${fighter.baseRank}`;
+    if (fighter.rank > fighter.baseRank) return `Moved down from #${fighter.baseRank}`;
+    return "Holding original seed";
   }
 
   function renderFighters() {
@@ -275,6 +303,21 @@
     }
 
     populateFightDropdowns();
+  }
+
+  function fighterCard(fighter, admin = false) {
+    const lastFight = getFighterHistory(fighter.name)[0];
+
+    return `
+      <article class="fighter-card" data-fighter="${escapeAttr(fighter.name)}">
+        <div class="rank">#${fighter.rank}</div>
+        <h2>${escapeHtml(fighter.name)}</h2>
+        <p class="meta">Leaderboard rank: #${fighter.rank}</p>
+        <p class="meta">${fighter.wins} wins / ${fighter.losses} losses / ${fighter.draws} draws</p>
+        <p class="meta">Last result: ${lastFight ? getFightResultText(fighter.name, lastFight) : "No fights yet"}</p>
+        ${admin ? `<p class="meta">Stats are recalculated from valid fight results.</p>` : ""}
+      </article>
+    `;
   }
 
   function ensureHistoryPanel(container, location) {
@@ -302,8 +345,8 @@
 
   function renderFighterHistory(name) {
     const panel =
-      document.getElementById("fighterHistoryPanel") ||
-      document.getElementById("fighterPageHistoryPanel");
+      document.getElementById("fighterPageHistoryPanel") ||
+      document.getElementById("fighterHistoryPanel");
 
     if (!panel) return;
 
@@ -320,8 +363,9 @@
       </div>
 
       <p class="meta">
-        Current leaderboard rank: #${fighter ? fighter.rank : "?"} /
-        Record: ${fighter ? fighter.wins : 0} wins, ${fighter ? fighter.losses : 0} losses
+        Wins: ${fighter ? fighter.wins : 0} /
+        Losses: ${fighter ? fighter.losses : 0} /
+        Draws: ${fighter ? fighter.draws : 0}
       </p>
 
       <div class="fight-list">
@@ -334,27 +378,12 @@
     `;
   }
 
-  function fighterCard(fighter, admin = false) {
-    const lastFight = getFighterHistory(fighter.name)[0];
-
-    return `
-      <article class="fighter-card" data-fighter="${escapeAttr(fighter.name)}" style="cursor:pointer">
-        <div class="rank">#${fighter.rank}</div>
-        <h2>${escapeHtml(fighter.name)}</h2>
-        <p class="meta">Leaderboard rank: #${fighter.rank}</p>
-        <p class="meta">${fighter.wins} wins / ${fighter.losses} losses</p>
-        <p class="meta">Last result: ${lastFight ? getFightResultText(fighter.name, lastFight) : "No fights yet"}</p>
-        ${admin ? `<p class="meta">Stats are recalculated from valid fight results.</p>` : ""}
-      </article>
-    `;
-  }
-
   function fighterHistoryCard(name, fight) {
     return `
       <article class="fight-item">
         <div class="item-top">
           <strong>${escapeHtml(fight.fighter1)} vs ${escapeHtml(fight.fighter2)}</strong>
-          <span class="badge ${classForStatus(fight.status)}">${labelStatus(fight.status)}</span>
+          <span class="badge ${classForStatus(fight.status, fight.result)}">${labelStatus(fight.status, fight.result)}</span>
         </div>
 
         <p class="meta">${getFightResultText(name, fight)}</p>
@@ -375,17 +404,10 @@
   function getFightResultText(name, fight) {
     const opponent = fight.fighter1 === name ? fight.fighter2 : fight.fighter1;
 
-    if (fight.status === "no-contest") {
-      return `No Contest vs ${opponent}`;
-    }
-
-    if (fight.status === "reversed") {
-      return `Reversed fight vs ${opponent}`;
-    }
-
-    if (fight.winner === name) {
-      return `Win vs ${opponent}`;
-    }
+    if (fight.status === "no-contest") return `No Contest vs ${opponent}`;
+    if (fight.status === "reversed") return `Reversed fight vs ${opponent}`;
+    if (fight.result === "draw") return `Draw vs ${opponent}`;
+    if (fight.winner === name) return `Win vs ${opponent}`;
 
     return `Loss vs ${opponent}`;
   }
@@ -401,9 +423,7 @@
     const upcomingEvents = document.getElementById("upcomingEvents");
 
     if (eventList) eventList.innerHTML = eventHtml;
-    if (upcomingEvents) {
-      upcomingEvents.innerHTML = approved.slice(0, 3).map(eventCard).join("") || empty("No upcoming events.");
-    }
+    if (upcomingEvents) upcomingEvents.innerHTML = approved.slice(0, 3).map(eventCard).join("") || empty("No upcoming events.");
   }
 
   function renderAdmin() {
@@ -440,6 +460,7 @@
 
     if (eventDashboard) {
       eventDashboard.innerHTML = state.events
+        .slice()
         .sort((a, b) => String(a.date).localeCompare(String(b.date)))
         .map((event) => eventCard(event, true))
         .join("") || empty("No events created.");
@@ -463,11 +484,13 @@
       <article class="fight-item">
         <div class="item-top">
           <strong>${escapeHtml(fight.fighter1)} vs ${escapeHtml(fight.fighter2)}</strong>
-          <span class="badge ${classForStatus(fight.status)}">${labelStatus(fight.status)}</span>
+          <span class="badge ${classForStatus(fight.status, fight.result)}">${labelStatus(fight.status, fight.result)}</span>
         </div>
 
         <div class="meta">
-          Winner: ${escapeHtml(fight.winner || "None")} / ${escapeHtml(fight.type || "1v1")} / ${formatDateTime(fight.timestamp)}
+          ${fight.result === "draw" ? "Result: Draw" : `Winner: ${escapeHtml(fight.winner || "None")}`}
+          / ${escapeHtml(fight.type || "1v1")}
+          / ${formatDateTime(fight.timestamp)}
         </div>
 
         ${fight.comment ? `<p class="meta">Comment: ${escapeHtml(fight.comment)}</p>` : ""}
@@ -482,9 +505,12 @@
         <div class="item-top">
           <div>
             <strong>${escapeHtml(fight.fighter1)} vs ${escapeHtml(fight.fighter2)}</strong>
-            <p class="meta">Winner: ${escapeHtml(fight.winner || "None")} / ${formatDateTime(fight.timestamp)}</p>
+            <p class="meta">
+              ${fight.result === "draw" ? "Result: Draw" : `Winner: ${escapeHtml(fight.winner || "None")}`}
+              / ${formatDateTime(fight.timestamp)}
+            </p>
           </div>
-          <span class="badge ${classForStatus(fight.status)}">${labelStatus(fight.status)}</span>
+          <span class="badge ${classForStatus(fight.status, fight.result)}">${labelStatus(fight.status, fight.result)}</span>
         </div>
 
         ${fight.comment ? `<p class="meta">Comment: ${escapeHtml(fight.comment)}</p>` : ""}
@@ -547,28 +573,19 @@
     event.preventDefault();
 
     const form = new FormData(event.currentTarget);
-    const identity = String(form.get("identity") || "").trim();
+    const email = String(form.get("identity") || "").trim();
     const password = String(form.get("password") || "").trim();
 
     try {
-      if (!state.isFirebase && identity === ADMIN_PASSWORD) {
-        state.isAdmin = true;
-      } else if (state.isFirebase && identity.includes("@") && password) {
-        await state.auth.signInWithEmailAndPassword(identity, password);
-
-        const token = await state.auth.currentUser.getIdTokenResult(true);
-        state.isAdmin = token.claims.admin === true;
-
-        if (!state.isAdmin) throw new Error("This Firebase user is not an admin.");
-      } else {
-        throw new Error(
-          state.isFirebase
-            ? "Use a Firebase account with the admin custom claim."
-            : "Wrong admin password."
-        );
+      if (!state.isFirebase) {
+        throw new Error("Firebase is not connected.");
       }
 
+      await state.auth.signInWithEmailAndPassword(email, password);
+
+      state.isAdmin = true;
       sessionStorage.setItem("sfc-admin", "true");
+
       message("loginMessage", "Admin controls unlocked.");
       render();
     } catch (error) {
@@ -591,12 +608,14 @@
     if (!requireAdmin()) return;
 
     const form = new FormData(event.currentTarget);
+    const result = form.get("result");
 
     const fight = {
       id: crypto.randomUUID(),
       fighter1: form.get("fighter1"),
       fighter2: form.get("fighter2"),
-      winner: form.get("winner"),
+      winner: result === "draw" ? "" : form.get("winner"),
+      result,
       type: form.get("type"),
       status: "valid",
       reason: "",
@@ -608,7 +627,7 @@
       return message("fightMessage", "Choose two different fighters.");
     }
 
-    if (![fight.fighter1, fight.fighter2].includes(fight.winner)) {
+    if (fight.result !== "draw" && ![fight.fighter1, fight.fighter2].includes(fight.winner)) {
       return message("fightMessage", "Winner must be one of the selected fighters.");
     }
 
@@ -685,33 +704,21 @@
     if (action === "no-contest") {
       const reason = prompt("No Contest reason:");
       if (!reason) return;
-
-      await updateDoc("fights", id, {
-        status: "no-contest",
-        reason: clean(reason)
-      });
+      await updateDoc("fights", id, { status: "no-contest", reason: clean(reason) });
     }
 
     if (action === "reverse-fight") {
       const reason = prompt("Reversal reason:");
       if (!reason) return;
-
-      await updateDoc("fights", id, {
-        status: "reversed",
-        reason: clean(reason)
-      });
+      await updateDoc("fights", id, { status: "reversed", reason: clean(reason) });
     }
 
     if (action === "delete-fight") {
-      if (confirm("Delete this fight permanently?")) {
-        await deleteDoc("fights", id);
-      }
+      if (confirm("Delete this fight permanently?")) await deleteDoc("fights", id);
     }
 
     if (action === "delete-event") {
-      if (confirm("Delete this event?")) {
-        await deleteDoc("events", id);
-      }
+      if (confirm("Delete this event?")) await deleteDoc("events", id);
     }
 
     if (action === "approve-suggestion") {
@@ -736,8 +743,8 @@
     }
   }
 
-  async function saveDoc(collection, doc, publicWrite = false) {
-    if (!publicWrite && !requireAdmin()) return;
+  async function saveDoc(collection, doc) {
+    if (!requireAdmin()) return;
 
     if (state.isFirebase) {
       await state.db.collection(collection).doc(doc.id).set(doc);
@@ -754,10 +761,7 @@
     if (state.isFirebase) {
       await state.db.collection(collection).doc(id).update(patch);
     } else {
-      state[collection] = state[collection].map((item) => {
-        return item.id === id ? { ...item, ...patch } : item;
-      });
-
+      state[collection] = state[collection].map((item) => item.id === id ? { ...item, ...patch } : item);
       persistLocal();
       render();
     }
@@ -769,10 +773,7 @@
     if (state.isFirebase) {
       await state.db.collection("suggestions").doc(id).update({ status });
     } else {
-      state.suggestions = state.suggestions.map((item) => {
-        return item.id === id ? { ...item, status } : item;
-      });
-
+      state.suggestions = state.suggestions.map((item) => item.id === id ? { ...item, status } : item);
       persistLocal();
       render();
     }
@@ -801,9 +802,7 @@
     ["fighter1", "fighter2", "winner"].forEach((name) => {
       const select = form.elements[name];
       if (!select) return;
-
       const current = select.value;
-
       select.innerHTML = options;
       select.value = current || select.value;
     });
@@ -811,14 +810,12 @@
 
   function requireAdmin() {
     if (state.isAdmin) return true;
-
     alert("Admin login required.");
     return false;
   }
 
   function setConnectionStatus() {
     const label = state.isFirebase ? "Firestore live" : "Local storage mode";
-
     document.querySelectorAll("#connectionStatus").forEach((el) => {
       el.textContent = label;
     });
@@ -848,22 +845,20 @@
 
   function formatDateTime(value) {
     if (!value) return "No timestamp";
-
-    return new Date(value).toLocaleString([], {
-      dateStyle: "medium",
-      timeStyle: "short"
-    });
+    return new Date(value).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
   }
 
-  function labelStatus(status) {
+  function labelStatus(status, result) {
     if (status === "no-contest") return "No Contest";
     if (status === "reversed") return "Reversed";
+    if (result === "draw") return "Draw";
     return "Valid";
   }
 
-  function classForStatus(status) {
+  function classForStatus(status, result) {
     if (status === "no-contest") return "no-contest";
     if (status === "reversed") return "reversed";
+    if (result === "draw") return "draw";
     return "valid";
   }
 
@@ -880,3 +875,4 @@
     text(id, value);
   }
 })();
+```
