@@ -1,34 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Fighters</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>School Fight Club | Fighters</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body data-page="fighters">
+    <aside class="sidebar">
+      <a class="brand" href="index.html"><span>SFC</span><strong>School Fight Club</strong></a>
+      <nav>
+        <a href="index.html">Leaderboard</a>
+        <a class="active" href="fighters.html">Fighters</a>
+        <a href="events.html">Events</a>
+        <a href="rules.html">Rules</a>
+        <a href="suggest.html">Suggest</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </aside>
 
-<nav>
-  <a href="index.html">🏆 Rankings</a>
-  <a href="fighters.html">👊 Fighters</a>
-</nav>
-
-<div class="container">
-  <h1>👊 Fighters</h1>
-  <div id="fighters"></div>
-</div>
-
-<script>
-fetch("data/fighters.json")
-  .then(r => r.json())
-  .then(data => {
-    document.getElementById("fighters").innerHTML =
-      data.map(f=>`
-        <div class="card">
-          <h3>${f.name}</h3>
-          <p>W:${f.wins} | L:${f.losses}</p>
+    <main class="app">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">Official roster</p>
+          <h1>Fighters</h1>
         </div>
-      `).join("");
-  });
-</script>
+        <div class="status-pill" id="connectionStatus">Loading</div>
+      </section>
 
-</body>
+      <section class="panel">
+        <div class="fighter-grid" id="fighterGrid"></div>
+      </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
