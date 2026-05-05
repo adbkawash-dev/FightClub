@@ -920,9 +920,5 @@ function renderCompletedEvents() {
 }
 
 
-const card = generateFightCard(state.rankings);
-console.log(card);
-
-
   
 })();
