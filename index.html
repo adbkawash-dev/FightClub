@@ -1,1 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>School Fight Club</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<nav>
+  <h2>SFC</h2>
+  <a href="index.html">🏆 Rankings</a>
+  <a href="fighters.html">👊 Fighters</a>
+  <a href="events.html">📅 Events</a>
+  <a href="rules.html">📜 Rules</a>
+  <a href="suggest.html">➕ Suggest</a>
+</nav>
+
+<div class="container">
+  <h1>🏆 Rankings</h1>
+  <div id="rankings"></div>
+</div>
+
+<script>
+fetch("data/fighters.json")
+  .then(r => r.json())
+  .then(data => {
+
+    const sorted = [...data].sort((a,b)=>{
+      if(a.name==="Kinan") return -1;
+      if(b.name==="Kinan") return 1;
+      return b.wins - a.wins;
+    });
+
+    document.getElementById("rankings").innerHTML =
+      sorted.map((f,i)=>`
+        <div class="card">
+          <h3>#${i+1} ${f.name}</h3>
+          <p>Wins: ${f.wins} | Losses: ${f.losses}</p>
+        </div>
+      `).join("");
+  });
+</script>
+
+</body>
+</html>
