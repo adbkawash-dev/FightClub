@@ -246,6 +246,9 @@ const state = {
   function render() {
     state.rankings = calculateRankings(state.fighters, state.fights);
 
+const card = generateFightCard(state.rankings);
+console.log(card);
+
     renderLeaderboard();
     renderFighters();
     renderEvents();
@@ -253,9 +256,6 @@ const state = {
     renderRecentFights();
     renderHomeStats();
 
-
-  const card = generateFightCard(state.rankings);
-  console.log("UFC Card:", card);
   }
 
   function renderHomeStats() {
