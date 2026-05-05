@@ -252,6 +252,10 @@ const state = {
     renderAdmin();
     renderRecentFights();
     renderHomeStats();
+
+
+  const card = generateFightCard(state.rankings);
+  console.log("UFC Card:", card);
   }
 
   function renderHomeStats() {
