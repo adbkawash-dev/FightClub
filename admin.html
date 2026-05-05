@@ -1,1 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<div class="container">
+
+<h1>🔒 Admin Panel</h1>
+
+<input id="pass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+
+<div id="panel" style="display:none;">
+  <h2>Log Fight</h2>
+
+  <input placeholder="Fighter 1">
+  <input placeholder="Fighter 2">
+  <input placeholder="Winner">
+
+  <button onclick="alert('Manually update fighters.json on GitHub')">
+    Submit Fight
+  </button>
+</div>
+
+</div>
+
+<script>
+function login(){
+  if(document.getElementById("pass").value==="admin123"){
+    document.getElementById("panel").style.display="block";
+  } else {
+    alert("Wrong password");
+  }
+}
+</script>
+
+</body>
+</html>
