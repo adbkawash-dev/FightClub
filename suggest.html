@@ -1,22 +1,48 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Suggest</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>School Fight Club | Suggest Event</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body data-page="suggest">
+    <aside class="sidebar">
+      <a class="brand" href="index.html"><span>SFC</span><strong>School Fight Club</strong></a>
+      <nav>
+        <a href="index.html">Leaderboard</a>
+        <a href="fighters.html">Fighters</a>
+        <a href="events.html">Events</a>
+        <a href="rules.html">Rules</a>
+        <a class="active" href="suggest.html">Suggest</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </aside>
 
-<nav>
-  <a href="index.html">🏆 Rankings</a>
-</nav>
+    <main class="app">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">User submission</p>
+          <h1>Suggest Event</h1>
+        </div>
+        <div class="status-pill" id="connectionStatus">Loading</div>
+      </section>
 
-<div class="container">
-  <h1>➕ Suggest Event</h1>
+      <section class="panel narrow">
+        <form id="suggestForm" class="form-grid">
+          <label>Event title<input name="title" required maxlength="80" placeholder="Friday ranking card"></label>
+          <label>Match type<select name="type"><option>1v1</option><option>2v2</option><option>3v3</option></select></label>
+          <label>Date<input name="date" type="date" required></label>
+          <button class="button primary" type="submit">Submit for approval</button>
+          <p class="form-message" id="suggestMessage"></p>
+        </form>
+      </section>
+    </main>
 
-  <input placeholder="Event name">
-  <input placeholder="Type (1v1 / 2v2 / 3v3)">
-  <button onclick="alert('Sent to admin')">Submit</button>
-</div>
-
-</body>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
