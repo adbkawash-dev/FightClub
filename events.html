@@ -6,6 +6,7 @@
     <title>School Fight Club | Events</title>
     <link rel="stylesheet" href="style.css">
   </head>
+
   <body data-page="events">
     <aside class="sidebar">
       <a class="brand" href="index.html"><span>SFC</span><strong>School Fight Club</strong></a>
@@ -20,6 +21,7 @@
     </aside>
 
     <main class="app">
+
       <section class="topbar">
         <div>
           <p class="eyebrow">Cards and matches</p>
@@ -28,13 +30,28 @@
         <div class="status-pill" id="connectionStatus">Loading</div>
       </section>
 
+      <!-- APPROVED EVENTS -->
       <section class="panel">
         <div class="section-head">
           <h2>Approved Events</h2>
           <a class="button ghost" href="suggest.html">Suggest event</a>
         </div>
+
         <div class="event-list" id="eventList"></div>
       </section>
+
+      <!-- COMPLETED EVENTS (FIGHT LOGS) -->
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">History</p>
+            <h2>Completed Events</h2>
+          </div>
+        </div>
+
+        <div id="fightLogs"></div>
+      </section>
+
     </main>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
