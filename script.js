@@ -29,17 +29,25 @@
 
   const page = document.body.dataset.page;
 
-  const state = {
-    fighters: [],
-    fights: [],
-    events: [],
-    suggestions: [],
-    rankings: [],
-    db: null,
-    auth: null,
-    isFirebase: false,
-    isAdmin: sessionStorage.getItem("sfc-admin") === "true"
-  };
+const state = {
+  fighters: [],
+  fights: [],
+  events: [],
+  suggestions: [],
+  rankings: [],
+  db: null,
+  auth: null,
+  isFirebase: false,
+  isAdmin: sessionStorage.getItem("sfc-admin") === "true",
+
+  champion: null,
+  titleDefenses: 0,
+  divisions: {
+    lightweight: [],
+    welterweight: [],
+    heavyweight: []
+  }
+};
 
   document.addEventListener("DOMContentLoaded", init);
 
