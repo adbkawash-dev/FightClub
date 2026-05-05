@@ -1,45 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>School Fight Club</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>School Fight Club | Rankings</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body data-page="home">
+    <aside class="sidebar">
+      <a class="brand" href="index.html"><span>SFC</span><strong>School Fight Club</strong></a>
+      <nav>
+        <a class="active" href="index.html">Leaderboard</a>
+        <a href="fighters.html">Fighters</a>
+        <a href="events.html">Events</a>
+        <a href="rules.html">Rules</a>
+        <a href="suggest.html">Suggest</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </aside>
 
-<nav>
-  <h2>SFC</h2>
-  <a href="index.html">🏆 Rankings</a>
-  <a href="fighters.html">👊 Fighters</a>
-  <a href="events.html">📅 Events</a>
-  <a href="rules.html">📜 Rules</a>
-  <a href="suggest.html">➕ Suggest</a>
-</nav>
-
-<div class="container">
-  <h1>🏆 Rankings</h1>
-  <div id="rankings"></div>
-</div>
-
-<script>
-fetch("data/fighters.json")
-  .then(r => r.json())
-  .then(data => {
-
-    const sorted = [...data].sort((a,b)=>{
-      if(a.name==="Kinan") return -1;
-      if(b.name==="Kinan") return 1;
-      return b.wins - a.wins;
-    });
-
-    document.getElementById("rankings").innerHTML =
-      sorted.map((f,i)=>`
-        <div class="card">
-          <h3>#${i+1} ${f.name}</h3>
-          <p>Wins: ${f.wins} | Losses: ${f.losses}</p>
+    <main class="app">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">Competitive ranking system</p>
+          <h1>School Fight Club</h1>
         </div>
-      `).join("");
-  });
-</script>
+        <div class="status-pill" id="connectionStatus">Loading league</div>
+      </section>
 
-</body>
-</html>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Current champion lock</p>
+          <h2>Kinan starts at #1 and only loses the top spot after a valid defeat.</h2>
+        </div>
+        <div class="stat-grid">
+          <div><span id="totalFighters">0</span><small>Fighters</small></div>
+          <div><span id="validFightCount">0</span><small>Valid fights</small></div>
+          <div><span id="ignoredFightCount">0</span><small>Ignored fights</small></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class
