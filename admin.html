@@ -1,117 +1,83 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>School Fight Club | Admin</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body data-page="admin">
-    <aside class="sidebar">
-      <a class="brand" href="index.html"><span>SFC</span><strong>School Fight Club</strong></a>
-      <nav>
-        <a href="index.html">Leaderboard</a>
-        <a href="fighters.html">Fighters</a>
-        <a href="events.html">Events</a>
-        <a href="rules.html">Rules</a>
-        <a href="suggest.html">Suggest</a>
-        <a class="active" href="admin.html">Admin</a>
-      </nav>
-    </aside>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>School Fight Club | Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="admin">
+  <aside class="sidebar">
+    <a class="brand" href="index.html"><span>SFC</span><strong>School Fight Club</strong></a>
+    <nav>
+      <a href="index.html">Leaderboard</a>
+      <a href="fighters.html">Fighters</a>
+      <a href="events.html">Events</a>
+      <a href="rules.html">Rules</a>
+      <a href="suggest.html">Suggest</a>
+      <a class="active" href="admin.html">Admin</a>
+    </nav>
+  </aside>
 
-    <main class="app">
-      <section class="topbar">
-        <div>
-          <p class="eyebrow">Restricted controls</p>
-          <h1>Admin Panel</h1>
-        </div>
-        <button class="button ghost hidden" id="logoutButton" type="button">Log out</button>
-      </section>
+  <main class="app">
+    <section class="topbar">
+      <div><p class="eyebrow">Restricted controls</p><h1>Admin Panel</h1></div>
+      <button class="button ghost hidden" id="logoutButton" type="button">Log out</button>
+    </section>
 
-      <section class="panel narrow" id="loginPanel">
-        <h2>Admin Login</h2>
-        <form id="adminLoginForm" class="form-grid">
-          <label>Email or password<input name="identity" autocomplete="username" placeholder="admin@example.com or admin123"></label>
-          <label>Firebase password<input name="password" type="password" autocomplete="current-password" placeholder="Only needed for Firebase Auth"></label>
-          <button class="button primary" type="submit">Unlock admin controls</button>
-          <p class="form-message" id="loginMessage"></p>
+    <section class="panel narrow" id="loginPanel">
+      <h2>Admin Login</h2>
+      <form id="adminLoginForm" class="form-grid">
+        <label>Email<input name="identity" autocomplete="username" required placeholder="admin@email.com"></label>
+        <label>Password<input name="password" type="password" autocomplete="current-password" required placeholder="Firebase password"></label>
+        <button class="button primary" type="submit">Unlock admin controls</button>
+        <p class="form-message" id="loginMessage"></p>
+      </form>
+    </section>
+
+    <section class="admin-space hidden" id="adminPanel">
+      <div class="panel">
+        <div class="section-head"><div><p class="eyebrow">Fight logger</p><h2>Log Fight</h2></div></div>
+        <form id="fightForm" class="form-grid three">
+          <label>Fighter 1<select name="fighter1" required></select></label>
+          <label>Fighter 2<select name="fighter2" required></select></label>
+          <label>Winner<select name="winner" required></select></label>
+          <label>Result<select name="result"><option value="win">Win/Loss</option><option value="draw">Draw</option></select></label>
+          <label>Match type<select name="type"><option>1v1</option><option>2v2</option><option>3v3</option></select></label>
+          <label>Fight comment<textarea name="comment" placeholder="Clean win, close fight, rule note"></textarea></label>
+          <button class="button primary" type="submit">Submit fight</button>
+          <p class="form-message" id="fightMessage"></p>
         </form>
-      </section>
+      </div>
 
-      <section class="admin-space hidden" id="adminPanel">
-        <div class="panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Fight logger</p>
-              <h2>Log Fight</h2>
-            </div>
-          </div>
+      <div class="panel">
+        <div class="section-head"><div><p class="eyebrow">Fight management</p><h2>All Fights</h2></div></div>
+        <div class="fight-list manage" id="fightDashboard"></div>
+      </div>
 
-          <form id="fightForm" class="form-grid three">
-            <label>Fighter 1<select name="fighter1" required></select></label>
-            <label>Fighter 2<select name="fighter2" required></select></label>
-            <label>Winner<select name="winner" required></select></label>
-            <label>Match type<select name="type"><option>1v1</option><option>2v2</option><option>3v3</option></select></label>
+      <div class="panel">
+        <div class="section-head"><div><p class="eyebrow">Event controls</p><h2>Events</h2></div></div>
+        <form id="eventForm" class="form-grid three">
+          <label>Title<input name="title" required maxlength="80" placeholder="Title fight card"></label>
+          <label>Type<select name="type"><option>1v1</option><option>2v2</option><option>3v3</option></select></label>
+          <label>Date<input name="date" type="date" required></label>
+          <button class="button primary" type="submit">Create event</button>
+          <p class="form-message" id="eventMessage"></p>
+        </form>
 
-            <label>
-              Fight comment
-              <textarea name="comment" placeholder="Clean win, close fight, referee stoppage, rule note"></textarea>
-            </label>
+        <h3>Suggested Events</h3>
+        <div class="event-list manage" id="suggestionDashboard"></div>
 
-            <button class="button primary" type="submit">Submit fight</button>
-            <p class="form-message" id="fightMessage"></p>
-          </form>
-        </div>
+        <h3>Approved Events</h3>
+        <div class="event-list manage" id="eventDashboard"></div>
+      </div>
+    </section>
+  </main>
 
-        <div class="panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Fight management</p>
-              <h2>All Fights</h2>
-            </div>
-          </div>
-          <div class="fight-list manage" id="fightDashboard"></div>
-        </div>
-
-        <div class="panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Fighter controls</p>
-              <h2>Fighter Stats</h2>
-            </div>
-          </div>
-          <div class="fighter-grid compact" id="adminFighterGrid"></div>
-        </div>
-
-        <div class="panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Event controls</p>
-              <h2>Events</h2>
-            </div>
-          </div>
-
-          <form id="eventForm" class="form-grid three">
-            <label>Title<input name="title" required maxlength="80" placeholder="Title fight card"></label>
-            <label>Type<select name="type"><option>1v1</option><option>2v2</option><option>3v3</option></select></label>
-            <label>Date<input name="date" type="date" required></label>
-            <button class="button primary" type="submit">Create event</button>
-            <p class="form-message" id="eventMessage"></p>
-          </form>
-
-          <h3>Suggested Events</h3>
-          <div class="event-list manage" id="suggestionDashboard"></div>
-
-          <h3>Approved Events</h3>
-          <div class="event-list manage" id="eventDashboard"></div>
-        </div>
-      </section>
-    </main>
-
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="script.js"></script>
-  </body>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>
