@@ -5,13 +5,13 @@
 
   const OFFICIAL_FIGHTERS = [
     { id: "kinan", name: "Kinan", wins: 0, losses: 0, draws: 0, rank: 1, baseRank: 1, active: true },
-    { id: "ayham", name: "Ayham", wins: 0, losses: 0, draws: 0, rank: 2, baseRank: 2, active: true },
+    { id: "aburoza", name: "Aburoza", wins: 0, losses: 0, draws: 0, rank: 2, baseRank: 2, active: true },
     { id: "hajar", name: "Hajar", wins: 0, losses: 0, draws: 0, rank: 3, baseRank: 3, active: true },
-    { id: "aburoza", name: "Aburoza", wins: 0, losses: 0, draws: 0, rank: 4, baseRank: 4, active: true },
-    { id: "mubarak-al-khalifa", name: "Mubarak Al Khalifa", wins: 0, losses: 0, draws: 0, rank: 5, baseRank: 5, active: true },
-    { id: "mustafa", name: "Mustafa", wins: 0, losses: 0, draws: 0, rank: 6, baseRank: 6, active: true },
+    { id: "abed", name: "Abed", wins: 0, losses: 0, draws: 0, rank: 4, baseRank: 4, active: true },
+    { id: "mustafa", name: "Mustafa", wins: 0, losses: 0, draws: 0, rank: 5, baseRank: 5, active: true },
+    { id: "mubarak-al-khalifa", name: "Mubarak Al Khalifa", wins: 0, losses: 0, draws: 0, rank: 6, baseRank: 6, active: true },
     { id: "rayyan", name: "Rayyan", wins: 0, losses: 0, draws: 0, rank: 7, baseRank: 7, active: true },
-    { id: "abed", name: "Abed", wins: 0, losses: 0, draws: 0, rank: 8, baseRank: 10, active: true }
+    { id: "ayham", name: "Ayham", wins: 0, losses: 0, draws: 0, rank: 8, baseRank: 10, active: true }
   ];
 
   const DEFAULT_EVENTS = [
