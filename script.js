@@ -11,9 +11,7 @@
     { id: "mubarak-al-khalifa", name: "Mubarak Al Khalifa", wins: 0, losses: 0, draws: 0, rank: 5, baseRank: 5, active: true },
     { id: "mustafa", name: "Mustafa", wins: 0, losses: 0, draws: 0, rank: 6, baseRank: 6, active: true },
     { id: "rayyan", name: "Rayyan", wins: 0, losses: 0, draws: 0, rank: 7, baseRank: 7, active: true },
-    { id: "ahmad-zoubi", name: "Ahmad Zoubi", wins: 0, losses: 0, draws: 0, rank: 8, baseRank: 8, active: true },
-    { id: "abdi", name: "Abdi", wins: 0, losses: 0, draws: 0, rank: 9, baseRank: 9, active: true },
-    { id: "abed", name: "Abed", wins: 0, losses: 0, draws: 0, rank: 10, baseRank: 10, active: true }
+    { id: "abed", name: "Abed", wins: 0, losses: 0, draws: 0, rank: 8, baseRank: 10, active: true }
   ];
 
   const DEFAULT_EVENTS = [
